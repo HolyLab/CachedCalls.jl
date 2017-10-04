@@ -13,13 +13,12 @@ export AbstractCachedCall,
 
 abstract type AbstractCachedCall{F<:Function, A<:Tuple, R} end
 
-description(cc::AbstractCachedCall) = cc.description
-func(cc::AbstractCachedCall) = cc.f
-func_args(cc::AbstractCachedCall) = cc.args
-result(cc::AbstractCachedCall) = get(cc.result) #This will throw an error if cc hasn't been executed
+description(cc::T) where {T<:AbstractCachedCall} = cc.description
+func(cc::T) where {T<:AbstractCachedCall}  = cc.f
+func_args(cc::T) where {T<:AbstractCachedCall} = cc.args
+result(cc::T) where {T<:AbstractCachedCall} = get(cc.result) #This will throw an error if cc hasn't been executed
 
-is_executed(cc::AbstractCachedCall) = !isnull(cc.result)
-
+is_executed(cc::T) where {T<:AbstractCachedCall} = !isnull(cc.result)
 
 #uncall! and call! are also applied recursively to any args that are AbstractCachedCalls
 function call!(cc::AbstractCachedCall)
