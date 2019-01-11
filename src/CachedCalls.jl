@@ -9,21 +9,23 @@ export AbstractCachedCall,
         func_args,
         result,
         call!,
-        uncall!
+        uncall!,
+        is_executed
 
 abstract type AbstractCachedCall{F<:Function, A<:Tuple, R} end
 
 description(cc::T) where {T<:AbstractCachedCall} = cc.description
 func(cc::T) where {T<:AbstractCachedCall}  = cc.f
 func_args(cc::T) where {T<:AbstractCachedCall} = cc.args
-result(cc::T) where {T<:AbstractCachedCall} = get(cc.result) #This will throw an error if cc hasn't been executed
+result(cc::T) where {T<:AbstractCachedCall} =
+    is_executed(cc) ? cc.result : error("Call has not been executed.")
 
-is_executed(cc::T) where {T<:AbstractCachedCall} = !isnull(cc.result)
+is_executed(cc::T) where {T<:AbstractCachedCall} = !(cc.result === nothing)
 
 #uncall! and call! are also applied recursively to any args that are AbstractCachedCalls
 function call!(cc::AbstractCachedCall)
     if !is_executed(cc)
-        cc.result = Nullable(func(cc)(call!(func_args(cc)...)...))
+        cc.result = func(cc)(call!(func_args(cc)...)...)
     end
     return result(cc)
 end
@@ -34,15 +36,16 @@ call!(a, args...) = (a, call!(args...)...)
 
 function uncall!(cc::AbstractCachedCall{F,A,R}) where {F, A, R}
     if is_executed(cc)
-        cc.result = Nullable{R}()
-        cc.args = uncall!(func_args(cc)...)
+        cc.result = nothing
+        uncall!(func_args(cc)...)
     end
     return cc
 end
 
 uncall!() = ()
-uncall!(a::AbstractCachedCall{F,A,R}, args...) where {F, A, R} = (uncall!(a), uncall!(args...)...)
-uncall!(a, args...) = (a, uncall!(args...)...)
+uncall!(a::AbstractCachedCall{F,A,R}, args...) where {F, A, R} =
+    begin uncall!(a); uncall!(args...) end
+uncall!(a, args...) = uncall!(args...)
 
 function Base.show(s::IO, cc::AbstractCachedCall{F, A, R}) where {F, A, R}
     stat = "Unexecuted"
@@ -58,14 +61,15 @@ function Base.show(s::IO, cc::AbstractCachedCall{F, A, R}) where {F, A, R}
     end
 end
 
-mutable struct CachedCall{F<:Function, A, R} <: AbstractCachedCall{F, A, R}
+mutable struct CachedCall{F, A, R} <: AbstractCachedCall{F, A, R}
     description::String
     f::F
     args::A
-    result::Nullable{R}
+    result::Union{R, Nothing}
 end
 
-CachedCall(description::String, f::F, args::A, result_type = Any) where {F<:Function, A<:Tuple} = CachedCall{F, A, result_type}(description, f, args, Nullable{result_type}())
-CachedCall(f::F, args::A, result_type = Any) where {F<:Function, A<:Tuple} = CachedCall("", f, args, Nullable{result_type}())
+CachedCall(description::String, f::F, args::A, result_type = Any) where {F<:Function, A<:Tuple} =
+    CachedCall{F, A, result_type}(description, f, args, nothing)
+CachedCall(f::F, args::A, result_type = Any) where {F<:Function, A<:Tuple} = CachedCall("", f, args, result_type)
 
 end # module
