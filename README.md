@@ -1,7 +1,7 @@
 # CachedCalls
-[![Build Status](https://travis-ci.org/HolyLab/CachedCalls.svg?branch=master)](https://travis-ci.com/HolyLab/CachedCalls.jl)
+[![Build Status](https://travis-ci.com/HolyLab/CachedCalls.jl.svg?branch=master)](https://travis-ci.com/HolyLab/CachedCalls.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/y3d4brokc6kq6aga?svg=true)](https://ci.appveyor.com/project/Cody-G/cachedcalls/branch/master)
-[![codecov](https://codecov.io/gh/HolyLab/CachedCalls/branch/master/graph/badge.svg)](https://codecov.io/gh/HolyLab/CachedCalls.jl)
+[![codecov](https://codecov.io/gh/HolyLab/CachedCalls.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/HolyLab/CachedCalls.jl)
 
 When created, a `CachedCall` stores a function, its arguments, and optionally a text description.
 
