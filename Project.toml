@@ -1,6 +1,6 @@
 name = "CachedCalls"
 uuid = "b89da37c-15e8-11e9-0b03-ab0995a60613"
-version = "0.1.0"
+version = "0.1.1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
